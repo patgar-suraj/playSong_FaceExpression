@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
+import Songs from "./Songs";
 
 export default function FacialExpression() {
   const videoRef = useRef(null);
@@ -54,12 +55,12 @@ export default function FacialExpression() {
 
   return (
     <div className="w-full flex items-start justify-start gap-20">
-      <div className="w-[35rem] flex flex-col gap-10">
+      <div className="w-7xl flex flex-col gap-10">
         <video
           ref={videoRef}
           autoPlay
           muted
-          className="w-full h-[23rem] rounded-4xl bg-white border-2 border-white object-cover"
+          className="w-full h-92 rounded-4xl bg-white border-2 border-white object-cover"
         />
 
         <div className="w-full flex items-center justify-between">
@@ -71,13 +72,13 @@ export default function FacialExpression() {
           </button>
 
           <span className="bg-blue-600 py-2 px-4 rounded-full text-white font-bold">
-            {_expression ? _expression.toUpperCase() : "No Face Detected!"}
+            {_expression ? _expression.toUpperCase() : "Detecting..."}
           </span>
         </div>
       </div>
 
-      <div className="bg-[#0f0f0f] text-white p-3 w-[50rem] rounded-2xl">
-        <h1 className="font-bold text-2xl">Related Musics</h1>
+      <div className="bg-[#0f0f0f] text-white p-3 w-full rounded-2xl">
+        <Songs />
       </div>
     </div>
   );
