@@ -1,10 +1,9 @@
 const express = require("express")
-const songRoute = require("./routes/song.routes")
+const songRouter = require("./routes/song.routes")
 
 const app = express()
 
 app.use(express.json())
-app.use("/", songRoute)
-
+app.use("/", songRouter)
 
 module.exports = app
