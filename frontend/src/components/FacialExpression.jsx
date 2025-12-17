@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
-import Songs from "./Songs";
+import axios from "axios";
 
-export default function FacialExpression() {
+export default function FacialExpression({ setmusic }) {
   const videoRef = useRef(null);
   const [_expression, set_expression] = useState("");
 
@@ -10,7 +10,6 @@ export default function FacialExpression() {
     const MODEL_URL = "/models";
     await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
     await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
-    console.log("Models loaded");
   };
 
   const startVideo = () => {
@@ -28,6 +27,8 @@ export default function FacialExpression() {
     const detections = await faceapi
       .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
       .withFaceExpressions();
+    let mostProableExpression = 0;
+    let mostExpression = "";
 
     if (!detections || detections.length === 0) {
       console.log("No face detected!");
@@ -35,19 +36,54 @@ export default function FacialExpression() {
       return;
     }
 
-    const expressions = detections[0].expressions;
-
-    // Find highest probability expression
-    let best = ["", 0];
-    for (const key of Object.keys(expressions)) {
-      if (expressions[key] > best[1]) {
-        best = [key, expressions[key]];
+    for (const expression of Object.keys(detections[0].expressions)) {
+      if (detections[0].expressions[expression] > mostProableExpression) {
+        mostProableExpression = detections[0].expressions[expression];
+        mostExpression = expression;
       }
     }
 
-    set_expression(best[0]);
-    console.log("Detected:", best[0]);
+    console.log(mostExpression);
+
+    axios.get(`http://localhost:3000/song?mood=${mostExpression}`).then((response) => {
+      setmusic(response.data.songs);
+      console.log(response.data);
+    });
   }
+
+  // async function detectFace() {
+  //   if (!videoRef.current) return;
+
+  //   const detections = await faceapi
+  //     .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
+  //     .withFaceExpressions();
+  //     let mostProableExpression = 0
+
+  //   if (!detections || detections.length === 0) {
+  //     console.log("No face detected!");
+  //     set_expression(""); // optional
+  //     return;
+  //   }
+
+  //   const expressions = detections[0].expressions;
+
+  //   // Find highest probability expression
+  //   let best = ["", 0];
+  //   for (const key of Object.keys(expressions)) {
+  //     if (expressions[key] > best[1]) {
+  //       best = [key, expressions[key]];
+  //     }
+  //   }
+
+  //   set_expression(best[0]);
+  //   console.log("Detected:", best[0]);
+
+  //   axios.get(`http://localhost:3000/song?mood=${best[0]}`)
+  //   .then(response=>{
+  //     setmusic(response.data.songs)
+  //     console.log(response.data)
+  //   })
+  // }
 
   useEffect(() => {
     loadModels().then(startVideo);
@@ -55,7 +91,7 @@ export default function FacialExpression() {
 
   return (
     <div className="w-full flex items-start justify-start gap-20">
-      <div className="w-7xl flex flex-col gap-10">
+      <div className="w-full flex flex-col gap-10">
         <video
           ref={videoRef}
           autoPlay
@@ -75,10 +111,6 @@ export default function FacialExpression() {
             {_expression ? _expression.toUpperCase() : "Detecting..."}
           </span>
         </div>
-      </div>
-
-      <div className="bg-[#0f0f0f] text-white p-3 w-full rounded-2xl">
-        <Songs />
       </div>
     </div>
   );
