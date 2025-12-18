@@ -47,11 +47,25 @@ export default function FacialExpression({ setmusic }) {
       }
     }
 
+    // map face-api expressions to backend mood categories
+    const moodMap = {
+      happy: "happy",
+      sad: "sad",
+      neutral: "neutral",
+      angry: "angry",
+      surprised: "surprised",
+      disgusted: "angry",
+      fearful: "sad",
+    };
+
+    const moodQuery = moodMap[mostExpression] || mostExpression;
+
     axios
-      .get(`http://localhost:3000/song?mood=${mostExpression}`)
+      .get(`http://localhost:3000/song?mood=${moodQuery}`)
       .then((response) => {
         setmusic(response.data.songs);
-      });
+      })
+      .catch((err) => console.error("Error fetching songs:", err));
   }
 
   useEffect(() => {

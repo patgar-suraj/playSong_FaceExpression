@@ -1,0 +1,5 @@
+musicnn
+librosa
+numpy
+scipy
+soundfile
