@@ -3,11 +3,12 @@ const router = express.Router();
 const multer = require("multer");
 const uploadFile = require("../service/storage.service");
 const songModel = require("../model/song.model");
+const { v4: uuidv4 } = require("uuid");
 
 // setup multer
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // Optional: Limit file size to 10MB
+  limits: { fileSize: 10 * 1024 * 1024 }, 
 });
 
 router.post("/song", upload.single("audio"), async (req, res) => {
@@ -27,6 +28,7 @@ router.post("/song", upload.single("audio"), async (req, res) => {
 
     // 3. Save to Database
     const song = await songModel.create({
+      id: uuidv4(),
       title: req.body.title,
       artist: req.body.artist,
       mood: req.body.mood,
